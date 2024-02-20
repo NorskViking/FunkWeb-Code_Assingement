@@ -4,7 +4,7 @@ import datetime as dt
 import requests
 import json
 import simplejson
-from typing import List
+from typing import Dict, List, Union
 
 YR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 HTTP_DATETIME_FORMAT = "%a, %d %b %Y %H:%M:%S %Z"
@@ -28,18 +28,65 @@ USER_AGENT = {"User-Agent": "Weather_ForeCast jorgen@funkweb.org"}
 
 url = BASE_URL+OSLO
 
-weather_data = requests.get(url, headers=USER_AGENT).json()
+class Place:
+    """Holds data for a place
+    
+    Attributes:
+        name: Name of place
+        coordinates: 
+    """
+    def __init__(
+        self,
+        name: str,
+        latitude: Union[float, int],
+        longitude: Union[float, int],
+    ):
+        """Create Place object
+        """
+        self.name = name
+        self.coordinates: Dict[str, Union[float, int, None]] = {
+            "latitude": round(latitude, 4),
+            "longitude": round(longitude, 4),
+        }
 
-#print(first_req)
-
-# Store weather_data in local JSON file.
-with open('weather.json', 'w') as json_file:
-    json_file.write(simplejson.dumps(weather_data, indent=4))
-
-#response = requests.get(url).json()
-#print(response.status_code)
-
-#data = response.text
+class Variable:
+    """Store data of weather variables
+    
+    """
+    def __init__(
+        self,
+        name: str,
+        value: Union[float, int],
+        units: str
+    ):
+        self.name = name
+        self.value = value
+        self.units = units
+        
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Variable):
+            return self.value == other.value and self.units == other.units
+        if isinstance(other, (int, float)):
+            return self.value == other
+        return NotImplemented
+    
+    def __lt__(self, other: object) -> bool:
+        if isinstance(other, Variable) and self.units == other.units:
+            return self.value < other.value
+        if isinstance(other, (int, float)):
+            return self.value < other
+        return NotImplemented
+    
+    def __add__(self, other: object) -> "Variable":
+        if isinstance(other, Variable) and self.name == other.name and self.units == other.units:
+            return Variable(self.name, self.value + other.value, self.units)
+        return NotImplemented
+    
+    def __sub__(self, other: object) -> "Variable":
+        if isinstance(other, Variable) and self.name == other.name and self.units == other.units:
+            return Variable(self.name, self.value - other.value, self.units)
+        return NotImplemented
+    
 
 class Interval:
     """Stores Interval information about weather forecast.
@@ -54,6 +101,7 @@ class Interval:
         start_time: dt.datetime,
         end_time: dt.datetime,
         symbol_code: str,
+        variables: Dict[str, Variable],
     ):
         """Create Interval object
         
@@ -65,6 +113,7 @@ class Interval:
         self.start_time = start_time
         self.end_time = end_time
         self.symbol_code = symbol_code
+        self.variables = variables
     
     @property
     def duration(self) -> dt.timedelta:
@@ -124,3 +173,17 @@ class Data:
                 relevant_intervals.append(interval)
                 
         return relevant_intervals
+    
+    
+weather_data = requests.get(url, headers=USER_AGENT).json()
+
+#print(first_req)
+
+# Store weather_data in local JSON file.
+with open('weather.json', 'w') as json_file:
+    json_file.write(simplejson.dumps(weather_data, indent=4))
+
+#response = requests.get(url).json()
+#print(response.status_code)
+
+#data = response.text
