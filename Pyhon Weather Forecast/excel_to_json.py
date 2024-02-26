@@ -12,7 +12,7 @@ import pandas
 """
 
 # Read excel files and store only columns with the data we want to use, ignore unneeded data columns
-excel_data_df = pandas.read_excel("worldcities.xlsx", usecols=['city', 'lat', 'lon', 'country'], converters={'city':str,'lat':str,'lon':str,'country':str})
+excel_data_df = pandas.read_excel("./data/worldcities.xlsx", usecols=['city', 'lat', 'lon', 'country'], converters={'city':str,'lat':str,'lon':str,'country':str})
 # Convert to JSON
 json_str = excel_data_df.to_json(orient='records')
 # Load into JSON dict
@@ -26,9 +26,9 @@ for i in json_dict:
         norway_dict.append(i)
 
 # Write all Norwegian cities from Excel file, into its own json file, with indent of 4 for easier reading
-with open('nor.json', 'w') as json_file:
+with open('./data/nor.json', 'w') as json_file:
     json_file.write(simplejson.dumps(norway_dict, indent=4))
 
 # Write all Cities from Excel file into json file, with indent of 4 for easier reading
-with open('city_data.json', 'w') as json_file:
+with open('./data/city_data.json', 'w') as json_file:
     json_file.write(simplejson.dumps(json_dict, indent=4))
