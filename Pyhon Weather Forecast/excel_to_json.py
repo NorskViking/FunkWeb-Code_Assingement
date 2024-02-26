@@ -21,9 +21,9 @@ json_dict = json.loads(json_str)
 # Create empty dict for storing only Norwegian cities
 norway_dict = []
 # Loop thru the full dict and append Norwegian cities into norway_dict
-for i in json_dict:
-    if i['country'] == 'Norway':
-        norway_dict.append(i)
+for city in json_dict:
+    if city['country'] == 'Norway':
+        norway_dict.append(city)
 
 # Write all Norwegian cities from Excel file, into its own json file, with indent of 4 for easier reading
 with open('./data/nor.json', 'w') as json_file:

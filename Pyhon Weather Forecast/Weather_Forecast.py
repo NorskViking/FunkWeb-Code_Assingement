@@ -3,7 +3,6 @@
 import datetime as dt
 import requests
 import json
-import simplejson
 from pathlib import Path
 from typing import Dict, List, Union, Optional
 
@@ -18,7 +17,7 @@ class Place:
     
     Attributes:
         name: Name of place
-        coordinates: 
+        coordinates: latitude and longitude coordinates
     """
     def __init__(
         self,
@@ -171,14 +170,30 @@ class Data:
         self.units = units
         self.intervals = intervals
         
-    def intervals_for(self, day: dt.date) -> List[Interval]:
-        """Return interval for given day"""
-        relevant_intervals: List[Interval] = []
+    def __repr__(self) -> str:
+        return (
+            f"Data({self.last_modified}, {self.expires}, {self.updated_at}, {self.units},)"
+            f"{self.intervals}"
+        )
         
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Data):
+            return (
+                self.last_modified == other.last_modified
+                and self.expires == other.expires
+                and self.updated_at == other.updated_at
+                and self.units == other.units
+                and self.intervals == other.intervals
+            )
+        return NotImplemented
+        
+    def intervals_for(self, day: dt.date) -> List[Interval]:
+        """Return intervals for given day"""
+        relevant_intervals: List[Interval] = []
         for interval in self.intervals:
             if interval.start_time.date() == day:
                 relevant_intervals.append(interval)
-                
+
         return relevant_intervals
     
     def intervals_between(self, start: dt.datetime, end: dt.datetime) -> List[Interval]:
@@ -385,30 +400,40 @@ class Forecast:
         self._parse_json()
         
         return return_status
+    
+"""
+class City:
+    def __init__(
+        self
+        ):
+        self.citys: dict
+        
+    def get_citys(self) -> None:
+        nor_cities = open("./data/nor.json")
+        # Convert JSON object to dict
+        nor_data = json.load(nor_cities)
+        # Close JSON file
+        nor_cities.close()
+        norwegian_citys = []
+        for city in nor_data:
+            norwegian_citys.append(Place(city["city"], float(city["lat"]), float(city["lon"])))
+        
+        self.citys = norwegian_citys
+"""        
 
-# Open JSON data over Norwegian cities
+"""
 nor_cities = open("./data/nor.json")
 # Convert JSON object to dict
 nor_data = json.load(nor_cities)
 # Close JSON file
 nor_cities.close()
-
-OSLO = {}
-# Get coordinates for Oslo and use as base location in Forecast
+norwegian_citys = []
 for city in nor_data:
-    if city['city'] == 'Oslo':
-        OSLO = Place(city['city'], float(city['lat']), float(city['lon']))
+    norwegian_citys.append(Place(city["city"], float(city["lat"]), float(city["lon"])))
 
-#Oslo = Place(OSLO)
+#print(norwegian_citys)
 
-oslo_forecast = Forecast(OSLO, USER_AGENT)
-oslo_forecast.update()
-
-first_interval = oslo_forecast.data.intervals[0]
-print(first_interval)
-print(first_interval.duration)
-print(first_interval.variables["precipitation_amount"].value)
-
-
-#with open('./data/weather.json', 'w') as json_file:
-#    json_file.write(simplejson.dumps(weather_data, indent=4))
+for city in norwegian_citys:
+    print(city.name)
+    
+"""
