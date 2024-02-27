@@ -43,7 +43,8 @@ def tomorrows_forecast(forecast: Forecast):
         temp_data = interval.variables["air_temperature"]
         rain_data = interval.variables["precipitation_amount"]
         wind_data = interval.variables["wind_speed"]
-        print(f"{start_time.time()}:", end=" ")
+        hour_min = str(start_time.time())[0:5] #Only get hours and minutes
+        print(f"kl. {hour_min}:", end=" ")
         if temperatur:
             print(f"Temperatur: {temp_data.value}{temp_data.units}", end=" ")
         if rain:
@@ -96,7 +97,6 @@ def median_temperature(forecast: Forecast):
         f"12:00-18:00: {third_median} celsius\n"
         f"18:00-00:00: {fourth_median} celsius\n"
         )
-            
 
 user_input = 1
 

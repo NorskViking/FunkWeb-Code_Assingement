@@ -10,7 +10,7 @@ YR_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 HTTP_DATETIME_FORMAT = "%a, %d %b %Y %H:%M:%S %Z"
 
 BASE_URL = f"https://api.met.no/weatherapi/locationforecast/2.0/compact?"
-USER_AGENT = "Weather_ForeCast jorgen@funkweb.org"
+USER_AGENT = "Weather_Forecast jorgen@funkweb.org"
 
 class Place:
     """Holds data for a place
